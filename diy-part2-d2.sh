@@ -22,7 +22,7 @@ sed -i "s/hostname='.*'/hostname='D2'/g" package/base-files/files/bin/config_gen
 
 # 修改默认时区
 sed -i "s/timezone='.*'/timezone='CST-8'/g" package/base-files/files/bin/config_generate
-sed -i "/.*timezone='CST-8'.*/i\ set system.@system[-1].zonename='Asia/Shanghai'" package/base-files/files/bin/config_generate
+sed -i "/.*timezone='CST-8'.*/a\ set system.@system[-1].zonename='Asia/Shanghai'" package/base-files/files/bin/config_generate
 
 # 修改固件名称
 sed -i "s/DISTRIB_ID='%D'/DISTRIB_ID='OpenWrt'/g" package/base-files/files/etc/openwrt_release
@@ -61,15 +61,17 @@ git clone https://github.com/EasyTier/luci-app-easytier.git package/easytier
 # 拉取 OpenAppFilter、luci-app-oaf
 git clone https://github.com/destan19/OpenAppFilter.git package/OpenAppFilter
 
+# 替换 tailscale 的默认启动脚本和配置
+sed -i '/\/etc\/init\.d\/tailscale/d;/\/etc\/config\/tailscale/d;' feeds/packages/net/tailscale/Makefile
+# 拉取 luci-app-tailscale
+git clone https://github.com/asvow/luci-app-tailscale.git package/luci-app-tailscale
+
 # 删除自带的 vlmcsd
 rm -rf feeds/packages/net/vlmcsd
 # 删除自带的 luci-app-vlmcsd
 rm -rf feeds/luci/applications/luci-app-vlmcsd
 # 删除自带的 luci-app-softethervpn
 rm -rf feeds/luci/applications/luci-app-softethervpn
-# 删除自带的 tailscale
-rm -rf feeds/packages/net/tailscale
-rm -rf package/feeds/packages/tailscale
 
 # 筛选程序
 function merge_package(){
@@ -96,8 +98,6 @@ merge_package other https://github.com/Lienol/openwrt-package.git feeds/packages
 merge_package other https://github.com/Lienol/openwrt-package.git feeds/luci/applications lean/luci-app-vlmcsd
 # 提取 luci-app-softethervpn
 merge_package main https://github.com/kenzok8/small-package.git feeds/luci/applications luci-app-softethervpn
-# 提取 tailscale、luci-app-tailscale
-merge_package main https://github.com/kenzok8/small-package.git package/small-package tailscale luci-app-tailscale
 # 提取 luci-app-socat
-merge_package main https://github.com/Lienol/openwrt-package.git package/luci luci-app-socat
-#merge_package main https://github.com/chenmozhijin/luci-app-socat.git package/luci luci-app-socat
+#merge_package main https://github.com/Lienol/openwrt-package.git package/luci luci-app-socat
+merge_package main https://github.com/chenmozhijin/luci-app-socat.git package/luci luci-app-socat
